@@ -4,6 +4,7 @@ const form = document.createElement("form")
 
 function getMonsters() {
     fetch("http://localhost:3000/monsters/?_limit=50")
+    // fetch(`http://localhost:3000/monsters/?_limit=20&_${Page}`)
     .then(response => response.json())
     .then(monsters => monsters.forEach(monster => postMonsters(monster)))
     .catch(error => console.log(error))
@@ -53,8 +54,6 @@ function createMonster() {
     
     form.append(createName, createAge, createDescription, button)
     monsterContainer.appendChild(form)
-
-    console.log(form)
 }
 createMonster()
 
@@ -81,3 +80,39 @@ function renderMon(monObj) {
     .then(response => response.json())
     .then(mon => postMonsters(mon))
 }
+
+let pgNum = 1
+const container = document.querySelector("#monster-container")
+
+function nextPage() {
+    // pgNum = pgNum + 1
+    // pgNum++
+    ++pgNum
+    console.log(pgNum)
+
+    fetch(`http://localhost:3000/monsters/?_limit=50&_page=${pgNum}`)
+    .then(response => response.json())
+    .then(nextMon => {
+        container.innerHTML = ""
+        nextMon.forEach(monster => {
+            postMonsters(monster)
+        })
+    })
+}
+
+const forwardButton = document.querySelector("#forward")
+forwardButton.addEventListener("click", nextPage)
+
+function backPage() {
+    pgNum = pgNum - 1
+    fetch(`http://localhost:3000/monsters/?_limit=50&_page=${pgNum}`)
+    .then(response => response.json())
+    .then(backMon => {
+        container.innerHTML = ""
+        backMon.forEach(monster => {
+            postMonsters(monster)
+        })
+    })
+}
+const backButton = document.querySelector("#back")
+backButton.addEventListener("click", backPage)
